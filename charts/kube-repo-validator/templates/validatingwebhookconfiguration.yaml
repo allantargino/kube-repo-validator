@@ -1,22 +1,20 @@
 apiVersion: admissionregistration.k8s.io/v1beta1
-kind: MutatingWebhookConfiguration
+kind: ValidatingWebhookConfiguration
 metadata:
-  name: sidecar-injector-webhook-cfg
+  name: {{ template "fullname" . }}
   labels:
-    app: sidecar-injector
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
 webhooks:
   - name: sidecar-injector.morven.me
     clientConfig:
       service:
-        name: sidecar-injector-webhook-svc
+        name: {{ template "fullname" . }}
         namespace: default
-        path: "/mutate"
-      caBundle: ${CA_BUNDLE}
+        path: "/"
+      # caBundle: ${CA_BUNDLE}
     rules:
       - operations: [ "CREATE" ]
         apiGroups: [""]
         apiVersions: ["v1"]
         resources: ["pods"]
-    namespaceSelector:
-      matchLabels:
-        sidecar-injector: enabled
+    namespaceSelector: {}
